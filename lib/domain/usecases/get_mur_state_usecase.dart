@@ -2,11 +2,9 @@ import '../../core/constants/app_constants.dart';
 import '../../core/constants/narrative_constants.dart';
 import '../entities/combat_result.dart';
 import '../entities/rune.dart';
-import '../repositories/rune_repository.dart';
-import '../repositories/veilleur_repository.dart';
-import 'apply_daily_decline_usecase.dart';
-import 'calculate_streak_multiplier_usecase.dart';
-import 'update_streak_usecase.dart';
+import '../repositories/repositories.dart';
+import 'progression_usecases.dart';
+import 'streak_usecases.dart';
 
 class GetMurStateUseCase {
   GetMurStateUseCase({

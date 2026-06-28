@@ -1,7 +1,7 @@
 import 'package:isar/isar.dart';
 
 import '../../domain/entities/rune.dart';
-import '../../domain/repositories/rune_repository.dart';
+import '../../domain/repositories/repositories.dart';
 import '../local/isar_service.dart';
 import '../local/models/rune_isar.dart';
 import '../mappers/entity_mapper.dart';

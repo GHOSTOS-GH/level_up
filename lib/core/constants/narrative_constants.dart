@@ -1,5 +1,4 @@
-import '../../domain/entities/chapitre.dart';
-import '../../domain/entities/palier_narratif.dart';
+import '../../domain/entities/narrative_entities.dart';
 
 class NarrativeConstants {
   NarrativeConstants._();

@@ -2,7 +2,7 @@ import 'dart:convert';
 
 import 'package:isar/isar.dart';
 
-import '../../domain/repositories/data_export_repository.dart';
+import '../../domain/repositories/repositories.dart';
 import '../local/isar_service.dart';
 import '../local/models/combat_isar.dart';
 import '../local/models/defi_isar.dart';

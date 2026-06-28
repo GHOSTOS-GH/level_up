@@ -5,7 +5,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../domain/entities/combat.dart';
 import '../../domain/entities/combat_result.dart';
 import '../../domain/entities/defi.dart';
-import '../../domain/usecases/calculate_progression_usecase.dart';
+import '../../domain/usecases/progression_usecases.dart';
 import 'mur_notifier.dart';
 import 'providers.dart';
 

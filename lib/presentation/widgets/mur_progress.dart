@@ -4,8 +4,7 @@ import 'package:flutter/material.dart';
 
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
-import '../../../domain/entities/chapitre.dart';
-import '../../../domain/entities/palier_narratif.dart';
+import '../../../domain/entities/narrative_entities.dart';
 
 class MurProgress extends StatelessWidget {
   const MurProgress({

@@ -2,7 +2,7 @@ import 'package:isar/isar.dart';
 
 import '../../domain/entities/combat.dart';
 import '../../domain/entities/combat_result.dart';
-import '../../domain/repositories/combat_repository.dart';
+import '../../domain/repositories/repositories.dart';
 import '../local/isar_service.dart';
 import '../local/models/combat_isar.dart';
 import '../mappers/entity_mapper.dart';

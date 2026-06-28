@@ -1,7 +1,7 @@
 import '../../core/constants/daily_challenges.dart';
-import '../../core/extensions/date_extensions.dart';
+import '../../core/extensions/extensions.dart';
 import '../entities/defi.dart';
-import '../repositories/defi_repository.dart';
+import '../repositories/repositories.dart';
 
 class GetTodayDefiUseCase {
   GetTodayDefiUseCase(this._repository);

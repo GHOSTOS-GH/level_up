@@ -1,8 +1,7 @@
 import '../../core/constants/narrative_constants.dart';
-import '../../domain/entities/message_secret.dart';
+import '../../domain/entities/narrative_entities.dart';
 import '../../domain/entities/rune.dart';
-import '../../domain/repositories/message_repository.dart';
-import '../../domain/repositories/rune_repository.dart';
+import '../../domain/repositories/repositories.dart';
 
 class SeedDataService {
   SeedDataService({

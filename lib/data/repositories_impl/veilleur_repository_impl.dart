@@ -2,7 +2,7 @@ import 'package:isar/isar.dart';
 
 import '../../core/constants/app_constants.dart';
 import '../../domain/entities/veilleur.dart';
-import '../../domain/repositories/veilleur_repository.dart';
+import '../../domain/repositories/repositories.dart';
 import '../local/isar_service.dart';
 import '../local/models/veilleur_isar.dart';
 import '../mappers/entity_mapper.dart';

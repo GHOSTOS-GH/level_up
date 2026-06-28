@@ -1,6 +1,20 @@
 import '../../core/constants/app_constants.dart';
-import '../../core/extensions/date_extensions.dart';
+import '../../core/extensions/extensions.dart';
 import '../entities/veilleur.dart';
+
+// ─── Streak multiplier ────────────────────────────────────────────────────────
+
+class CalculateStreakMultiplierUseCase {
+  double call(int streakDays) {
+    if (streakDays >= 31) return AppConstants.streakMultiplierTier5;
+    if (streakDays >= 15) return AppConstants.streakMultiplierTier4;
+    if (streakDays >= 8) return AppConstants.streakMultiplierTier3;
+    if (streakDays >= 4) return AppConstants.streakMultiplierTier2;
+    return AppConstants.streakMultiplierTier1;
+  }
+}
+
+// ─── Update streak ────────────────────────────────────────────────────────────
 
 class UpdateStreakUseCase {
   Veilleur call(Veilleur veilleur, DateTime combatDate) {
@@ -8,10 +22,7 @@ class UpdateStreakUseCase {
     final lastCombat = veilleur.lastCombatDate?.dateOnly;
 
     if (lastCombat == null) {
-      return veilleur.copyWith(
-        streakDays: 1,
-        lastCombatDate: today,
-      );
+      return veilleur.copyWith(streakDays: 1, lastCombatDate: today);
     }
 
     if (lastCombat.isSameDay(today)) {
@@ -27,10 +38,7 @@ class UpdateStreakUseCase {
       );
     }
 
-    return veilleur.copyWith(
-      streakDays: 1,
-      lastCombatDate: today,
-    );
+    return veilleur.copyWith(streakDays: 1, lastCombatDate: today);
   }
 
   Veilleur resetIfInactive(Veilleur veilleur, DateTime now) {
@@ -47,6 +55,8 @@ class UpdateStreakUseCase {
     return veilleur;
   }
 }
+
+// ─── Check streak reset ───────────────────────────────────────────────────────
 
 class CheckStreakResetUseCase {
   bool shouldResetStreak(Veilleur veilleur, DateTime now) {

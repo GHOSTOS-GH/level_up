@@ -1,9 +1,9 @@
 import 'package:isar/isar.dart';
 
 import '../../core/constants/daily_challenges.dart';
-import '../../core/extensions/date_extensions.dart';
+import '../../core/extensions/extensions.dart';
 import '../../domain/entities/defi.dart';
-import '../../domain/repositories/defi_repository.dart';
+import '../../domain/repositories/repositories.dart';
 import '../local/isar_service.dart';
 import '../local/models/defi_isar.dart';
 import '../mappers/entity_mapper.dart';

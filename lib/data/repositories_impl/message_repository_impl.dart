@@ -1,7 +1,7 @@
 import 'package:isar/isar.dart';
 
-import '../../domain/entities/message_secret.dart';
-import '../../domain/repositories/message_repository.dart';
+import '../../domain/entities/narrative_entities.dart';
+import '../../domain/repositories/repositories.dart';
 import '../local/isar_service.dart';
 import '../local/models/message_isar.dart';
 import '../mappers/entity_mapper.dart';

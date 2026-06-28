@@ -1,6 +1,6 @@
 import '../../../domain/entities/combat.dart';
 import '../../../domain/entities/defi.dart';
-import '../../../domain/entities/message_secret.dart';
+import '../../../domain/entities/narrative_entities.dart';
 import '../../../domain/entities/rune.dart';
 import '../../../domain/entities/veilleur.dart';
 import '../local/models/combat_isar.dart';

@@ -7,19 +7,14 @@ import '../../data/repositories_impl/message_repository_impl.dart';
 import '../../data/repositories_impl/rune_repository_impl.dart';
 import '../../data/repositories_impl/veilleur_repository_impl.dart';
 import '../../data/seed/seed_data_service.dart';
-import '../../domain/repositories/combat_repository.dart';
-import '../../domain/repositories/data_export_repository.dart';
-import '../../domain/repositories/defi_repository.dart';
-import '../../domain/repositories/message_repository.dart';
-import '../../domain/repositories/rune_repository.dart';
-import '../../domain/repositories/veilleur_repository.dart';
-import '../../domain/usecases/apply_daily_decline_usecase.dart';
-import '../../domain/usecases/calculate_progression_usecase.dart';
-import '../../domain/usecases/calculate_streak_multiplier_usecase.dart';
+import '../../domain/repositories/repositories.dart';
 import '../../domain/usecases/get_mur_state_usecase.dart';
 import '../../domain/usecases/get_today_defi_usecase.dart';
-import '../../domain/usecases/update_streak_usecase.dart';
+import '../../domain/usecases/progression_usecases.dart';
+import '../../domain/usecases/streak_usecases.dart';
 import '../../domain/usecases/validate_combat_usecase.dart';
+
+// ─── Repositories ─────────────────────────────────────────────────────────────
 
 final veilleurRepositoryProvider = Provider<VeilleurRepository>((ref) {
   throw UnimplementedError('Repository not initialized');
@@ -44,6 +39,8 @@ final runeRepositoryProvider = Provider<RuneRepository>((ref) {
 final dataExportRepositoryProvider = Provider<DataExportRepository>((ref) {
   throw UnimplementedError('Repository not initialized');
 });
+
+// ─── Use cases ────────────────────────────────────────────────────────────────
 
 final calculateProgressionProvider = Provider((ref) => CalculateProgressionUseCase());
 final calculateStreakMultiplierProvider = Provider((ref) => CalculateStreakMultiplierUseCase());
@@ -87,6 +84,8 @@ final seedDataServiceProvider = Provider((ref) {
     runeRepository: ref.watch(runeRepositoryProvider),
   );
 });
+
+// ─── Initializer ─────────────────────────────────────────────────────────────
 
 class AppInitializer {
   static Future<ProviderContainer> createContainer() async {

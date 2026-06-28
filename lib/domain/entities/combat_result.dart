@@ -1,7 +1,5 @@
-import 'chapitre.dart';
 import 'combat.dart';
-import 'message_secret.dart';
-import 'palier_narratif.dart';
+import 'narrative_entities.dart';
 import 'rune.dart';
 import 'veilleur.dart';
 
