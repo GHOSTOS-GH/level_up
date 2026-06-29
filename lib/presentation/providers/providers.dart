@@ -42,8 +42,10 @@ final dataExportRepositoryProvider = Provider<DataExportRepository>((ref) {
 
 // ─── Use cases ────────────────────────────────────────────────────────────────
 
-final calculateProgressionProvider = Provider((ref) => CalculateProgressionUseCase());
-final calculateStreakMultiplierProvider = Provider((ref) => CalculateStreakMultiplierUseCase());
+final calculateProgressionProvider =
+    Provider((ref) => CalculateProgressionUseCase());
+final calculateStreakMultiplierProvider =
+    Provider((ref) => CalculateStreakMultiplierUseCase());
 final updateStreakProvider = Provider((ref) => UpdateStreakUseCase());
 final applyDailyDeclineProvider = Provider((ref) => ApplyDailyDeclineUseCase());
 final applyProgressGainProvider = Provider((ref) => ApplyProgressGainUseCase());
@@ -89,12 +91,14 @@ final seedDataServiceProvider = Provider((ref) {
 
 class AppInitializer {
   static Future<ProviderContainer> createContainer() async {
-    final veilleurRepo = await VeilleurRepositoryImpl.create();
-    final combatRepo = await CombatRepositoryImpl.create();
-    final defiRepo = await DefiRepositoryImpl.create();
-    final messageRepo = await MessageRepositoryImpl.create();
-    final runeRepo = await RuneRepositoryImpl.create();
-    final exportRepo = await DataExportRepositoryImpl.create();
+    // Hive est déjà initialisé dans main.dart avant cet appel.
+    // On instancie directement les repositories (pas d'async nécessaire).
+    final veilleurRepo = VeilleurRepositoryImpl();
+    final combatRepo   = CombatRepositoryImpl();
+    final defiRepo     = DefiRepositoryImpl();
+    final messageRepo  = MessageRepositoryImpl();
+    final runeRepo     = RuneRepositoryImpl();
+    final exportRepo   = DataExportRepositoryImpl();
 
     final container = ProviderContainer(
       overrides: [

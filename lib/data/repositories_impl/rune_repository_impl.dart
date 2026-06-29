@@ -1,48 +1,33 @@
-import 'package:isar/isar.dart';
-
 import '../../domain/entities/rune.dart';
 import '../../domain/repositories/repositories.dart';
-import '../local/isar_service.dart';
-import '../local/models/rune_isar.dart';
+import '../local/hive_service.dart';
 import '../mappers/entity_mapper.dart';
 
 class RuneRepositoryImpl implements RuneRepository {
-  RuneRepositoryImpl(this._isar);
-
-  final Isar _isar;
-
-  static Future<RuneRepositoryImpl> create() async {
-    final isar = await IsarService.getInstance();
-    return RuneRepositoryImpl(isar);
-  }
-
   @override
   Future<List<Rune>> getAllRunes() async {
-    final runes = await _isar.runeIsars.where().findAll();
-    return runes.map(EntityMapper.toRune).toList();
+    final box = HiveService.runeBox;
+    return box.toMap().entries
+        .map((e) => EntityMapper.toRune(e.key as int, e.value))
+        .toList();
   }
 
   @override
   Future<void> saveRune(Rune rune) async {
-    await _isar.writeTxn(() async {
-      await _isar.runeIsars.put(EntityMapper.fromRune(rune));
-    });
+    await HiveService.runeBox.put(rune.id, EntityMapper.fromRune(rune));
   }
 
   @override
   Future<void> initializeRunes(List<Rune> runes) async {
-    final count = await _isar.runeIsars.count();
-    if (count > 0) return;
+    final box = HiveService.runeBox;
+    if (box.isNotEmpty) return;
 
-    await _isar.writeTxn(() async {
-      await _isar.runeIsars.putAll(
-        runes.map(EntityMapper.fromRune).toList(),
-      );
-    });
+    final entries = {for (final r in runes) r.id: EntityMapper.fromRune(r)};
+    await box.putAll(entries);
   }
 
   @override
   Future<int> countActiveRunes() async {
-    return _isar.runeIsars.filter().activeEqualTo(true).count();
+    return HiveService.runeBox.values.where((r) => r.active).length;
   }
 }

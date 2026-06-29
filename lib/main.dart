@@ -5,14 +5,19 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/routes/app_router.dart';
 import 'core/services/notification_service.dart';
 import 'core/theme/app_theme.dart';
+import 'data/local/hive_service.dart';
 import 'presentation/providers/providers.dart';
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await SystemChrome.setPreferredOrientations([
     DeviceOrientation.portraitUp,
     DeviceOrientation.portraitDown,
   ]);
+
+  // ── Initialisation Hive (doit être faite avant AppInitializer) ──
+  await HiveService.initialize();
 
   final container = await AppInitializer.createContainer();
   await NotificationService.instance.initialize();

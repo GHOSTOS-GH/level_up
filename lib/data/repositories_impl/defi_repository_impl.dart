@@ -1,33 +1,20 @@
-import 'package:isar/isar.dart';
-
 import '../../core/constants/daily_challenges.dart';
 import '../../core/extensions/extensions.dart';
 import '../../domain/entities/defi.dart';
 import '../../domain/repositories/repositories.dart';
-import '../local/isar_service.dart';
-import '../local/models/defi_isar.dart';
+import '../local/hive_service.dart';
 import '../mappers/entity_mapper.dart';
 
 class DefiRepositoryImpl implements DefiRepository {
-  DefiRepositoryImpl(this._isar);
-
-  final Isar _isar;
-
-  static Future<DefiRepositoryImpl> create() async {
-    final isar = await IsarService.getInstance();
-    return DefiRepositoryImpl(isar);
-  }
-
   @override
   Future<Defi> getTodayDefi() async {
     final today = DateTime.now().dateOnly;
-    final existing = await _isar.defiIsars
-        .filter()
-        .dateEqualTo(today)
-        .findFirst();
+    final key = _dateKey(today);
+    final box = HiveService.defiBox;
+    final existing = box.get(key);
 
     if (existing != null) {
-      return EntityMapper.toDefi(existing);
+      return EntityMapper.toDefi(box.keys.toList().indexOf(key), existing);
     }
 
     final template = DailyChallenges.forDay(today.weekday);
@@ -38,8 +25,12 @@ class DefiRepositoryImpl implements DefiRepository {
 
   @override
   Future<void> saveDefi(Defi defi) async {
-    await _isar.writeTxn(() async {
-      await _isar.defiIsars.put(EntityMapper.fromDefi(defi));
-    });
+    final key = _dateKey(defi.date);
+    await HiveService.defiBox.put(key, EntityMapper.fromDefi(defi));
   }
+
+  String _dateKey(DateTime d) =>
+      '${d.year.toString().padLeft(4, '0')}-'
+      '${d.month.toString().padLeft(2, '0')}-'
+      '${d.day.toString().padLeft(2, '0')}';
 }

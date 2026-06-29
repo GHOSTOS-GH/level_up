@@ -1,14 +1,12 @@
 plugins {
     id("com.android.application")
-    // "kotlin-android" retiré → Flutter gère Kotlin nativement (Built-in Kotlin)
-    // Garder le plugin manuellement causera des erreurs dans les prochaines versions Flutter
     id("dev.flutter.flutter-gradle-plugin")
 }
 
 android {
     namespace = "com.example.level_up"
-    compileSdk = 36                          // ← 35 → 36
-    ndkVersion = "28.2.13676358"            // ← 27.0.12077973 → 28.2.13676358
+    compileSdk = 36
+    ndkVersion = "28.2.13676358"
 
     compileOptions {
         isCoreLibraryDesugaringEnabled = true
@@ -23,7 +21,7 @@ android {
     defaultConfig {
         applicationId = "com.example.level_up"
         minSdk = flutter.minSdkVersion
-        targetSdk = 36                       // ← aligné avec compileSdk
+        targetSdk = 36
         versionCode = flutter.versionCode
         versionName = flutter.versionName
         multiDexEnabled = true

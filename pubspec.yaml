@@ -22,21 +22,21 @@ dependencies:
   flutter_local_notifications: ^18.0.1
   timezone: ^0.10.0
   flutter_timezone: ^4.1.0
-  file_picker: ^10.3.10           # ← ajout du ^ manquant
+  file_picker: ^10.3.10
 
-  # Isar : la lib native DOIT être présente pour Android/iOS
-  isar: ^3.1.0+1
-  isar_flutter_libs: ^3.1.0+1    # ← AJOUT CRITIQUE (était totalement absent !)
+  # ── Base de données : hive_ce (Community Edition, pur Dart, sans dépendance native) ──
+  hive_ce: ^2.9.0
+  hive_ce_flutter: ^2.3.4
 
 dev_dependencies:
   flutter_test:
     sdk: flutter
 
   flutter_lints: ^6.0.0
-  isar_generator: ^3.1.0+1       # ← retiré de dependencies (code-gen uniquement)
+  hive_ce_generator: ^1.8.0
   build_runner: ^2.4.13
 
 flutter:
   uses-material-design: true
   assets:
-    - assets/logo/
+    - assets/logo/logo.png
