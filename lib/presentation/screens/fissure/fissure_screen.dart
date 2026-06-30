@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
 import '../../../core/theme/app_theme.dart';
 import '../../../domain/entities/combat_result.dart';
+import '../../widgets/glass_widgets.dart';
 
 class FissureScreen extends StatefulWidget {
   const FissureScreen({super.key, required this.result});
@@ -62,7 +64,7 @@ class _FissureScreenState extends State<FissureScreen>
                   center: Alignment.center,
                   radius: 1.2 * _glowAnim.value + 0.5,
                   colors: [
-                    AppColors.accentLight.withValues(alpha: 0.15 * _glowAnim.value),
+                    AppColors.accentPurple.withValues(alpha: 0.18 * _glowAnim.value),
                     AppColors.background,
                   ],
                 ),
@@ -76,62 +78,49 @@ class _FissureScreenState extends State<FissureScreen>
                       scale: _scaleAnim.value,
                       child: Column(
                         children: [
-                          Text(
-                            '💥',
-                            style: TextStyle(fontSize: 64 * _scaleAnim.value),
-                          ),
+                          Text('💥', style: TextStyle(fontSize: 64 * _scaleAnim.value)),
                           const SizedBox(height: 16),
-                          Text(
+                          GradientText(
                             'La Fissure S\'ouvre',
-                            style: Theme.of(context).textTheme.displayMedium?.copyWith(
-                                  color: AppColors.accentLight,
-                                  shadows: [
-                                    Shadow(
-                                      color: AppColors.accentLight.withValues(alpha: 0.6),
-                                      blurRadius: 20,
-                                    ),
-                                  ],
-                                ),
-                            textAlign: TextAlign.center,
+                            gradient: AppColors.brandGradient,
+                            style: GoogleFonts.orbitron(
+                              fontSize: 24,
+                              fontWeight: FontWeight.w700,
+                            ),
                           ),
                         ],
                       ),
                     ),
-                    const SizedBox(height: 40),
+                    const SizedBox(height: 36),
                     _GainRow(
-                      icon: Icons.trending_up,
+                      icon: Icons.trending_up_rounded,
                       label: 'Progression au Mur',
                       value: '+${result.progressionGain.toStringAsFixed(1)}%',
                       color: AppColors.accentFire,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _GainRow(
-                      icon: Icons.landscape,
+                      icon: Icons.landscape_rounded,
                       label: 'Nouvelle progression',
                       value: '${result.newProgression.toStringAsFixed(1)}%',
-                      color: AppColors.accentWater,
+                      color: AppColors.accentCyan,
                     ),
-                    const SizedBox(height: 12),
+                    const SizedBox(height: 10),
                     _GainRow(
-                      icon: Icons.local_fire_department,
+                      icon: Icons.local_fire_department_rounded,
                       label: 'Streak',
-                      value: '${result.streakDays}j (x${result.streakMultiplier.toStringAsFixed(1)})',
+                      value:
+                          '${result.streakDays}j (x${result.streakMultiplier.toStringAsFixed(1)})',
                       color: AppColors.warning,
                     ),
                     if (result.revealedMessage != null) ...[
-                      const SizedBox(height: 24),
-                      Container(
-                        padding: const EdgeInsets.all(20),
-                        decoration: BoxDecoration(
-                          color: AppColors.surface,
-                          borderRadius: BorderRadius.circular(16),
-                          border: Border.all(
-                            color: AppColors.accentShadow.withValues(alpha: 0.5),
-                          ),
-                        ),
+                      const SizedBox(height: 20),
+                      GlassCard(
+                        accentColor: AppColors.accentPurple,
                         child: Column(
                           children: [
-                            const Text('🔮 Message Secret Révélé'),
+                            const Text('🔮 Message Secret Révélé',
+                                style: TextStyle(fontSize: 14)),
                             const SizedBox(height: 12),
                             Text(
                               result.revealedMessage!.content,
@@ -143,17 +132,12 @@ class _FissureScreenState extends State<FissureScreen>
                       ),
                     ],
                     if (result.unlockedRune != null) ...[
-                      const SizedBox(height: 16),
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.accentLight.withValues(alpha: 0.1),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.accentLight.withValues(alpha: 0.4)),
-                        ),
+                      const SizedBox(height: 14),
+                      GlassCard(
+                        accentColor: AppColors.accentCyan,
                         child: Row(
                           children: [
-                            const Text('⚡', style: TextStyle(fontSize: 28)),
+                            const Text('⚡', style: TextStyle(fontSize: 26)),
                             const SizedBox(width: 12),
                             Expanded(
                               child: Column(
@@ -163,10 +147,8 @@ class _FissureScreenState extends State<FissureScreen>
                                     'Rune débloquée: ${result.unlockedRune!.name}',
                                     style: Theme.of(context).textTheme.titleMedium,
                                   ),
-                                  Text(
-                                    result.unlockedRune!.description,
-                                    style: AppTheme.metadataStyle,
-                                  ),
+                                  Text(result.unlockedRune!.description,
+                                      style: AppTheme.metadataStyle),
                                 ],
                               ),
                             ),
@@ -175,12 +157,13 @@ class _FissureScreenState extends State<FissureScreen>
                       ),
                     ],
                     const Spacer(),
-                    ElevatedButton(
-                      onPressed: () => context.go(AppRoutes.mur),
-                      style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
+                    SizedBox(
+                      width: double.infinity,
+                      height: 54,
+                      child: ElevatedButton(
+                        onPressed: () => context.go(AppRoutes.mur),
+                        child: const Text('Retour au Mur'),
                       ),
-                      child: const Text('Retour au Mur'),
                     ),
                   ],
                 ),
@@ -208,12 +191,9 @@ class _GainRow extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Container(
+    return GlassCard(
       padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
-      decoration: BoxDecoration(
-        color: AppColors.surface,
-        borderRadius: BorderRadius.circular(12),
-      ),
+      accentColor: color,
       child: Row(
         children: [
           Icon(icon, color: color),

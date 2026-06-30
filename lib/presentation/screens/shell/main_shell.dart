@@ -3,6 +3,7 @@ import 'package:go_router/go_router.dart';
 
 import '../../../core/routes/app_router.dart';
 import '../../../core/theme/app_colors.dart';
+import '../../widgets/glass_widgets.dart';
 
 class MainShell extends StatelessWidget {
   const MainShell({super.key, required this.child});
@@ -21,34 +22,105 @@ class MainShell extends StatelessWidget {
   Widget build(BuildContext context) {
     final index = _currentIndex(context);
 
-    return Scaffold(
-      body: child,
-      bottomNavigationBar: Container(
-        decoration: BoxDecoration(
-          border: Border(
-            top: BorderSide(color: AppColors.surfaceElevated.withValues(alpha: 0.6)),
+    return AppBackground(
+      child: Scaffold(
+        backgroundColor: Colors.transparent,
+        extendBody: true,
+        body: child,
+        bottomNavigationBar: Padding(
+          padding: const EdgeInsets.fromLTRB(16, 0, 16, 16),
+          child: Container(
+            height: 68,
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated.withValues(alpha: 0.85),
+              borderRadius: BorderRadius.circular(24),
+              border: Border.all(color: AppColors.glassBorder),
+              boxShadow: [
+                BoxShadow(
+                  color: Colors.black.withValues(alpha: 0.4),
+                  blurRadius: 20,
+                  offset: const Offset(0, 8),
+                ),
+              ],
+            ),
+            child: Row(
+              children: [
+                _NavItem(
+                  icon: Icons.landscape_rounded,
+                  label: 'Le Mur',
+                  selected: index == 0,
+                  onTap: () => context.go(AppRoutes.mur),
+                ),
+                _NavItem(
+                  icon: Icons.fitness_center_rounded,
+                  label: 'Combat',
+                  selected: index == 1,
+                  onTap: () => context.go(AppRoutes.entrainement),
+                ),
+                _NavItem(
+                  icon: Icons.history_rounded,
+                  label: 'Historique',
+                  selected: index == 2,
+                  onTap: () => context.go(AppRoutes.historique),
+                ),
+                _NavItem(
+                  icon: Icons.settings_rounded,
+                  label: 'Réglages',
+                  selected: index == 3,
+                  onTap: () => context.go(AppRoutes.parametres),
+                ),
+              ],
+            ),
           ),
         ),
-        child: BottomNavigationBar(
-          currentIndex: index,
-          onTap: (i) {
-            switch (i) {
-              case 0:
-                context.go(AppRoutes.mur);
-              case 1:
-                context.go(AppRoutes.entrainement);
-              case 2:
-                context.go(AppRoutes.historique);
-              case 3:
-                context.go(AppRoutes.parametres);
-            }
-          },
-          items: const [
-            BottomNavigationBarItem(icon: Icon(Icons.landscape), label: 'Le Mur'),
-            BottomNavigationBarItem(icon: Icon(Icons.fitness_center), label: 'Combat'),
-            BottomNavigationBarItem(icon: Icon(Icons.history), label: 'Historique'),
-            BottomNavigationBarItem(icon: Icon(Icons.settings), label: 'Paramètres'),
-          ],
+      ),
+    );
+  }
+}
+
+class _NavItem extends StatelessWidget {
+  const _NavItem({
+    required this.icon,
+    required this.label,
+    required this.selected,
+    required this.onTap,
+  });
+
+  final IconData icon;
+  final String label;
+  final bool selected;
+  final VoidCallback onTap;
+
+  @override
+  Widget build(BuildContext context) {
+    final color = selected ? AppColors.accentPurpleLight : AppColors.textMuted;
+
+    return Expanded(
+      child: InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(20),
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          margin: const EdgeInsets.symmetric(horizontal: 6, vertical: 8),
+          decoration: BoxDecoration(
+            color: selected ? AppColors.accentPurple.withValues(alpha: 0.15) : Colors.transparent,
+            borderRadius: BorderRadius.circular(18),
+          ),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(icon, color: color, size: 22),
+              const SizedBox(height: 3),
+              Text(
+                label,
+                style: TextStyle(
+                  fontSize: 9.5,
+                  fontWeight: FontWeight.w600,
+                  color: color,
+                ),
+              ),
+            ],
+          ),
         ),
       ),
     );

@@ -12,6 +12,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../providers/mur_notifier.dart';
 import '../../providers/providers.dart';
 import '../../providers/streak_notifier.dart';
+import '../../widgets/glass_widgets.dart';
 import '../historique/historique_screen.dart';
 
 class ParametresScreen extends ConsumerStatefulWidget {
@@ -50,9 +51,7 @@ class _ParametresScreenState extends ConsumerState<ParametresScreen> {
   Future<void> _saveSettings() async {
     final murState = await ref.read(murStateProvider.future);
     final updated = murState.veilleur.copyWith(
-      nom: _nameController.text.trim().isEmpty
-          ? 'Veilleur'
-          : _nameController.text.trim(),
+      nom: _nameController.text.trim().isEmpty ? 'Veilleur' : _nameController.text.trim(),
       notificationHour: _notificationTime.hour,
       notificationMinute: _notificationTime.minute,
       notificationsEnabled: _notificationsEnabled,
@@ -80,15 +79,10 @@ class _ParametresScreenState extends ConsumerState<ParametresScreen> {
       final file = File('${dir.path}/level_up_backup.json');
       await file.writeAsString(json);
 
-      await Share.shareXFiles(
-        [XFile(file.path)],
-        subject: 'Level Up ! — Sauvegarde',
-      );
+      await Share.shareXFiles([XFile(file.path)], subject: 'Level Up ! — Sauvegarde');
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur export: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur export: $e')));
       }
     }
   }
@@ -97,9 +91,7 @@ class _ParametresScreenState extends ConsumerState<ParametresScreen> {
     try {
       final result = await FilePicker.platform.pickFiles(
         type: FileType.custom,
-        allowMultiple: true,
-        allowedExtensions: ['pdf'],
-        
+        allowedExtensions: ['json'],
       );
       if (result == null || result.files.single.path == null) return;
 
@@ -118,9 +110,7 @@ class _ParametresScreenState extends ConsumerState<ParametresScreen> {
       }
     } catch (e) {
       if (mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          SnackBar(content: Text('Erreur import: $e')),
-        );
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text('Erreur import: $e')));
       }
     }
   }
@@ -129,125 +119,162 @@ class _ParametresScreenState extends ConsumerState<ParametresScreen> {
   Widget build(BuildContext context) {
     if (!_loaded) {
       _loadSettings();
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.accentPurpleLight),
       );
     }
 
     final runesAsync = ref.watch(runesProvider);
     final isSunday = DateTime.now().weekday == DateTime.sunday;
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Paramètres')),
-      body: ListView(
-        padding: const EdgeInsets.all(20),
+    return SafeArea(
+      child: ListView(
+        padding: const EdgeInsets.fromLTRB(18, 16, 18, 110),
         children: [
-          Text('Personnalisation', style: Theme.of(context).textTheme.titleLarge),
+          Row(
+            children: [
+              const Text('⚙️', style: TextStyle(fontSize: 22)),
+              const SizedBox(width: 8),
+              Text('Paramètres', style: Theme.of(context).textTheme.titleLarge),
+            ],
+          ),
+          const SizedBox(height: 20),
+
+          SectionHeader(title: 'Personnalisation', emoji: '👤'),
           const SizedBox(height: 12),
-          TextField(
-            controller: _nameController,
-            decoration: const InputDecoration(labelText: 'Nom du Veilleur'),
+          GlassCard(
+            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+            child: TextField(
+              controller: _nameController,
+              decoration: const InputDecoration(
+                labelText: 'Nom du Veilleur',
+                border: InputBorder.none,
+              ),
+            ),
           ),
           const SizedBox(height: 24),
-          Text('Notifications offline', style: Theme.of(context).textTheme.titleLarge),
+
+          SectionHeader(title: 'Notifications', emoji: '🔔'),
           const SizedBox(height: 12),
-          SwitchListTile(
-            title: const Text('Activer les rappels'),
-            subtitle: const Text('100% local, aucune donnée envoyée'),
-            value: _notificationsEnabled,
-            activeColor: AppColors.accentFire,
-            onChanged: (v) => setState(() => _notificationsEnabled = v),
-          ),
-          ListTile(
-            title: const Text('Heure du rappel'),
-            subtitle: Text(_notificationTime.format(context)),
-            trailing: const Icon(Icons.access_time),
-            onTap: () async {
-              final picked = await showTimePicker(
-                context: context,
-                initialTime: _notificationTime,
-              );
-              if (picked != null) {
-                setState(() => _notificationTime = picked);
-              }
-            },
+          GlassCard(
+            padding: EdgeInsets.zero,
+            child: Column(
+              children: [
+                SwitchListTile(
+                  title: const Text('Activer les rappels'),
+                  subtitle: const Text('100% local, aucune donnée envoyée'),
+                  value: _notificationsEnabled,
+                  onChanged: (v) => setState(() => _notificationsEnabled = v),
+                ),
+                const Divider(height: 1),
+                ListTile(
+                  title: const Text('Heure du rappel'),
+                  subtitle: Text(_notificationTime.format(context)),
+                  trailing: const Icon(Icons.access_time_rounded, color: AppColors.accentPurpleLight),
+                  onTap: () async {
+                    final picked = await showTimePicker(
+                      context: context,
+                      initialTime: _notificationTime,
+                    );
+                    if (picked != null) setState(() => _notificationTime = picked);
+                  },
+                ),
+              ],
+            ),
           ),
           const SizedBox(height: 24),
-          Text('Runes de Repos', style: Theme.of(context).textTheme.titleLarge),
-          const SizedBox(height: 8),
-          Text(
-            isSunday
-                ? 'Dimanche — Activez jusqu\'à 2 runes'
-                : 'Les runes ne s\'activent que le dimanche',
-            style: AppTheme.metadataStyle,
+
+          SectionHeader(title: 'Runes de Repos', emoji: '🔮'),
+          const SizedBox(height: 6),
+          Padding(
+            padding: const EdgeInsets.only(left: 4),
+            child: Text(
+              isSunday ? 'Dimanche — Activez jusqu\'à 2 runes' : 'Les runes ne s\'activent que le dimanche',
+              style: AppTheme.metadataStyle,
+            ),
           ),
           const SizedBox(height: 12),
           runesAsync.when(
-            loading: () => const CircularProgressIndicator(),
+            loading: () => const Center(child: CircularProgressIndicator()),
             error: (e, _) => Text('Erreur: $e'),
             data: (runes) => Column(
               children: runes.map((rune) {
-                return Card(
-                  child: ListTile(
-                    leading: Text(
-                      rune.unlocked ? '⚡' : '🔒',
-                      style: const TextStyle(fontSize: 24),
-                    ),
-                    title: Text(rune.name),
-                    subtitle: Text(
-                      rune.unlocked
-                          ? rune.description
-                          : 'Débloquée après 7 jours de streak',
-                    ),
-                    trailing: rune.unlocked
-                        ? ElevatedButton(
+                return Container(
+                  margin: const EdgeInsets.only(bottom: 10),
+                  child: GlassCard(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                    accentColor: rune.unlocked ? AppColors.accentCyan : null,
+                    child: Row(
+                      children: [
+                        Text(rune.unlocked ? '⚡' : '🔒', style: const TextStyle(fontSize: 24)),
+                        const SizedBox(width: 14),
+                        Expanded(
+                          child: Column(
+                            crossAxisAlignment: CrossAxisAlignment.start,
+                            children: [
+                              Text(rune.name, style: Theme.of(context).textTheme.titleMedium),
+                              Text(
+                                rune.unlocked
+                                    ? rune.description
+                                    : 'Débloquée après 7 jours de streak',
+                                style: AppTheme.metadataStyle,
+                              ),
+                            ],
+                          ),
+                        ),
+                        if (rune.unlocked)
+                          ElevatedButton(
                             onPressed: isSunday && !rune.active
                                 ? () async {
-                                    final activated = await ref
-                                        .read(runesProvider.notifier)
-                                        .activateRune(rune.id);
-                                    if (mounted) {
+                                    final activated =
+                                        await ref.read(runesProvider.notifier).activateRune(rune.id);
+                                    if (context.mounted) {
                                       ScaffoldMessenger.of(context).showSnackBar(
                                         SnackBar(
-                                          content: Text(
-                                            activated != null
-                                                ? '${rune.name} activée !'
-                                                : 'Maximum 2 runes actives',
-                                          ),
+                                          content: Text(activated != null
+                                              ? '${rune.name} activée !'
+                                              : 'Maximum 2 runes actives'),
                                         ),
                                       );
                                     }
                                   }
                                 : null,
+                            style: ElevatedButton.styleFrom(
+                              minimumSize: const Size(0, 36),
+                              padding: const EdgeInsets.symmetric(horizontal: 16),
+                            ),
                             child: Text(rune.active ? 'Active' : 'Activer'),
-                          )
-                        : null,
+                          ),
+                      ],
+                    ),
                   ),
                 );
               }).toList(),
             ),
           ),
           const SizedBox(height: 24),
-          Text('Données', style: Theme.of(context).textTheme.titleLarge),
+
+          SectionHeader(title: 'Données', emoji: '💾'),
           const SizedBox(height: 12),
           OutlinedButton.icon(
             onPressed: _exportData,
-            icon: const Icon(Icons.upload),
+            icon: const Icon(Icons.upload_rounded, size: 18),
             label: const Text('Exporter JSON'),
           ),
-          const SizedBox(height: 8),
+          const SizedBox(height: 10),
           OutlinedButton.icon(
             onPressed: _importData,
-            icon: const Icon(Icons.download),
+            icon: const Icon(Icons.download_rounded, size: 18),
             label: const Text('Importer JSON'),
           ),
-          const SizedBox(height: 32),
-          ElevatedButton(
-            onPressed: _saveSettings,
-            style: ElevatedButton.styleFrom(
-              minimumSize: const Size(double.infinity, 52),
+          const SizedBox(height: 28),
+
+          SizedBox(
+            height: 54,
+            child: ElevatedButton(
+              onPressed: _saveSettings,
+              child: const Text('Enregistrer'),
             ),
-            child: const Text('Enregistrer'),
           ),
           const SizedBox(height: 16),
           Text(

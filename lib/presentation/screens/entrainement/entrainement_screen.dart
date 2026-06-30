@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:flutter_haptic_feedback/flutter_haptic_feedback.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:go_router/go_router.dart';
+import 'package:google_fonts/google_fonts.dart';
 
 import '../../../core/constants/exercise_list.dart';
 import '../../../core/routes/app_router.dart';
@@ -11,6 +12,7 @@ import '../../../core/theme/app_theme.dart';
 import '../../providers/combat_notifier.dart';
 import '../../providers/mur_notifier.dart';
 import '../../providers/providers.dart';
+import '../../widgets/glass_widgets.dart';
 import '../../widgets/particle_burst.dart';
 
 class EntrainementScreen extends ConsumerStatefulWidget {
@@ -56,9 +58,9 @@ class _EntrainementScreenState extends ConsumerState<EntrainementScreen> {
 
     showModalBottomSheet<void>(
       context: context,
-      backgroundColor: AppColors.surface,
+      backgroundColor: AppColors.surfaceElevated,
       shape: const RoundedRectangleBorder(
-        borderRadius: BorderRadius.vertical(top: Radius.circular(20)),
+        borderRadius: BorderRadius.vertical(top: Radius.circular(24)),
       ),
       builder: (ctx) => Padding(
         padding: EdgeInsets.only(
@@ -112,32 +114,42 @@ class _EntrainementScreenState extends ConsumerState<EntrainementScreen> {
     final calc = ref.watch(calculateProgressionProvider);
 
     if (combat == null) {
-      return const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      return const Center(
+        child: CircularProgressIndicator(color: AppColors.accentPurpleLight),
       );
     }
 
-    return Scaffold(
-      appBar: AppBar(title: const Text('Combat Actif')),
-      body: SafeArea(
-        child: Column(
-          children: [
-            Expanded(
-              child: SingleChildScrollView(
-                padding: const EdgeInsets.all(20),
-                child: Column(
-                  crossAxisAlignment: CrossAxisAlignment.stretch,
-                  children: [
-                    DropdownButtonFormField<String>(
+    return SafeArea(
+      child: Column(
+        children: [
+          Expanded(
+            child: SingleChildScrollView(
+              padding: const EdgeInsets.fromLTRB(18, 16, 18, 12),
+              child: Column(
+                crossAxisAlignment: CrossAxisAlignment.stretch,
+                children: [
+                  Row(
+                    children: [
+                      const Text('⚔️', style: TextStyle(fontSize: 22)),
+                      const SizedBox(width: 8),
+                      Text('Combat Actif', style: Theme.of(context).textTheme.titleLarge),
+                    ],
+                  ),
+                  const SizedBox(height: 18),
+
+                  // ── Sélecteur d'exercice ──
+                  GlassCard(
+                    padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 4),
+                    child: DropdownButtonFormField<String>(
                       value: combat.exercise,
-                      decoration: const InputDecoration(labelText: 'Exercice'),
+                      decoration: const InputDecoration(
+                        labelText: 'Exercice',
+                        border: InputBorder.none,
+                      ),
                       dropdownColor: AppColors.surfaceElevated,
                       items: [
                         if (!ExerciseList.exercises.contains(combat.exercise))
-                          DropdownMenuItem(
-                            value: combat.exercise,
-                            child: Text(combat.exercise),
-                          ),
+                          DropdownMenuItem(value: combat.exercise, child: Text(combat.exercise)),
                         ...ExerciseList.exercises.map(
                           (e) => DropdownMenuItem(value: e, child: Text(e)),
                         ),
@@ -148,212 +160,222 @@ class _EntrainementScreenState extends ConsumerState<EntrainementScreen> {
                         }
                       },
                     ),
-                    if (combat.defiName != null) ...[
-                      const SizedBox(height: 8),
-                      Text(
+                  ),
+                  if (combat.defiName != null) ...[
+                    const SizedBox(height: 8),
+                    Padding(
+                      padding: const EdgeInsets.only(left: 4),
+                      child: Text(
                         'Défi: ${combat.defiName}',
                         style: AppTheme.metadataStyle.copyWith(color: AppColors.accentFire),
                       ),
-                    ],
-                    const SizedBox(height: 16),
-                    if (combat.isResting)
-                      Container(
-                        padding: const EdgeInsets.all(16),
-                        decoration: BoxDecoration(
-                          color: AppColors.accentWater.withValues(alpha: 0.15),
-                          borderRadius: BorderRadius.circular(12),
-                          border: Border.all(color: AppColors.accentWater.withValues(alpha: 0.4)),
-                        ),
-                        child: Row(
-                          children: [
-                            const Icon(Icons.timer, color: AppColors.accentWater),
-                            const SizedBox(width: 12),
-                            Expanded(
-                              child: Text(
-                                'Repos: ${combat.restSecondsRemaining}s',
-                                style: Theme.of(context).textTheme.titleMedium,
-                              ),
-                            ),
-                            TextButton(
-                              onPressed: () =>
-                                  ref.read(combatNotifierProvider.notifier).skipRest(),
-                              child: const Text('Passer'),
-                            ),
-                          ],
-                        ),
-                      ),
-                    const SizedBox(height: 16),
-                    Text('Séries', style: Theme.of(context).textTheme.titleLarge),
-                    const SizedBox(height: 8),
-                    ...combat.series.map((serie) {
-                      return Dismissible(
-                        key: ValueKey('serie_${serie.index}'),
-                        direction: DismissDirection.endToStart,
-                        background: Container(
-                          alignment: Alignment.centerRight,
-                          padding: const EdgeInsets.only(right: 20),
-                          margin: const EdgeInsets.only(bottom: 8),
-                          decoration: BoxDecoration(
-                            color: AppColors.danger.withValues(alpha: 0.3),
-                            borderRadius: BorderRadius.circular(12),
-                          ),
-                          child: const Icon(Icons.delete, color: AppColors.danger),
-                        ),
-                        onDismissed: (_) {
-                          ref.read(combatNotifierProvider.notifier).removeSerie(serie.index);
-                        },
-                        child: Card(
-                          margin: const EdgeInsets.only(bottom: 8),
-                          color: serie.completed
-                              ? AppColors.success.withValues(alpha: 0.1)
-                              : AppColors.surface,
-                          child: InkWell(
-                            onTap: () => _showEditRepsModal(serie.index, serie.reps),
-                            borderRadius: BorderRadius.circular(16),
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 16,
-                                vertical: 12,
-                              ),
-                              child: Row(
-                                children: [
-                                  Checkbox(
-                                    value: serie.completed,
-                                    onChanged: (_) {
-                                      ref
-                                          .read(combatNotifierProvider.notifier)
-                                          .toggleSerieCompleted(serie.index);
-                                      if (!serie.completed) {
-                                        FlutterHapticFeedback.impact(ImpactFeedbackStyle.light);
-                                      }
-                                    },
-                                  ),
-                                  Expanded(
-                                    child: Column(
-                                      crossAxisAlignment: CrossAxisAlignment.start,
-                                      children: [
-                                        Text(
-                                          'Série ${serie.index}',
-                                          style: Theme.of(context).textTheme.titleMedium,
-                                        ),
-                                        Text(
-                                          '${serie.reps} reps',
-                                          style: AppTheme.metadataStyle,
-                                        ),
-                                      ],
-                                    ),
-                                  ),
-                                  Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: serie.completed
-                                          ? AppColors.success.withValues(alpha: 0.2)
-                                          : AppColors.warning.withValues(alpha: 0.2),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    child: Text(
-                                      serie.completed ? 'Complet' : 'En cours',
-                                      style: TextStyle(
-                                        fontSize: 12,
-                                        color: serie.completed
-                                            ? AppColors.success
-                                            : AppColors.warning,
-                                      ),
-                                    ),
-                                  ),
-                                  const Icon(Icons.edit, size: 18, color: AppColors.textMuted),
-                                ],
-                              ),
-                            ),
-                          ),
-                        ),
-                      );
-                    }),
-                    OutlinedButton.icon(
-                      onPressed: () {
-                        final lastReps = combat.series.isNotEmpty
-                            ? combat.series.last.reps
-                            : 10;
-                        ref.read(combatNotifierProvider.notifier).addSerie(reps: lastReps);
-                      },
-                      icon: const Icon(Icons.add),
-                      label: const Text('Ajouter une série'),
-                    ),
-                    const SizedBox(height: 24),
-                    Wrap(
-                      spacing: 12,
-                      runSpacing: 12,
-                      children: [
-                        _SummaryChip(
-                          label: 'Sets',
-                          value: '${combat.completedSets}/${combat.totalSets}',
-                        ),
-                        _SummaryChip(
-                          label: 'Reps',
-                          value: '${combat.totalReps}',
-                        ),
-                        _SummaryChip(
-                          label: 'Temps',
-                          value: _formatDuration(combat.elapsedSeconds),
-                        ),
-                        _SummaryChip(
-                          label: 'Calories',
-                          value: combat.estimatedCalories(calc).toStringAsFixed(0),
-                        ),
-                      ],
                     ),
                   ],
-                ),
+                  const SizedBox(height: 16),
+
+                  if (combat.isResting)
+                    Container(
+                      padding: const EdgeInsets.all(16),
+                      margin: const EdgeInsets.only(bottom: 16),
+                      decoration: BoxDecoration(
+                        color: AppColors.accentCyan.withValues(alpha: 0.1),
+                        borderRadius: BorderRadius.circular(16),
+                        border: Border.all(color: AppColors.accentCyan.withValues(alpha: 0.3)),
+                      ),
+                      child: Row(
+                        children: [
+                          const Icon(Icons.timer_rounded, color: AppColors.accentCyan),
+                          const SizedBox(width: 12),
+                          Expanded(
+                            child: Text(
+                              'Repos: ${combat.restSecondsRemaining}s',
+                              style: Theme.of(context).textTheme.titleMedium,
+                            ),
+                          ),
+                          TextButton(
+                            onPressed: () =>
+                                ref.read(combatNotifierProvider.notifier).skipRest(),
+                            child: const Text('Passer'),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                  SectionHeader(title: 'Séries', emoji: '🎯'),
+                  const SizedBox(height: 10),
+                  ...combat.series.map((serie) {
+                    return Dismissible(
+                      key: ValueKey('serie_${serie.index}'),
+                      direction: DismissDirection.endToStart,
+                      background: Container(
+                        alignment: Alignment.centerRight,
+                        padding: const EdgeInsets.only(right: 20),
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: AppColors.danger.withValues(alpha: 0.2),
+                          borderRadius: BorderRadius.circular(16),
+                        ),
+                        child: const Icon(Icons.delete_rounded, color: AppColors.danger),
+                      ),
+                      onDismissed: (_) {
+                        ref.read(combatNotifierProvider.notifier).removeSerie(serie.index);
+                      },
+                      child: Container(
+                        margin: const EdgeInsets.only(bottom: 10),
+                        decoration: BoxDecoration(
+                          color: serie.completed
+                              ? AppColors.success.withValues(alpha: 0.08)
+                              : AppColors.glassCard,
+                          borderRadius: BorderRadius.circular(16),
+                          border: Border.all(
+                            color: serie.completed
+                                ? AppColors.success.withValues(alpha: 0.3)
+                                : AppColors.glassBorder,
+                          ),
+                        ),
+                        child: InkWell(
+                          onTap: () => _showEditRepsModal(serie.index, serie.reps),
+                          borderRadius: BorderRadius.circular(16),
+                          child: Padding(
+                            padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 14),
+                            child: Row(
+                              children: [
+                                GestureDetector(
+                                  onTap: () {
+                                    ref
+                                        .read(combatNotifierProvider.notifier)
+                                        .toggleSerieCompleted(serie.index);
+                                    if (!serie.completed) {
+                                      FlutterHapticFeedback.impact(ImpactFeedbackStyle.light);
+                                    }
+                                  },
+                                  child: Container(
+                                    width: 26,
+                                    height: 26,
+                                    decoration: BoxDecoration(
+                                      color: serie.completed
+                                          ? AppColors.success
+                                          : Colors.transparent,
+                                      borderRadius: BorderRadius.circular(8),
+                                      border: Border.all(
+                                        color: serie.completed
+                                            ? AppColors.success
+                                            : AppColors.textMuted,
+                                        width: 2,
+                                      ),
+                                    ),
+                                    child: serie.completed
+                                        ? const Icon(Icons.check_rounded,
+                                            color: Colors.white, size: 16)
+                                        : null,
+                                  ),
+                                ),
+                                const SizedBox(width: 14),
+                                Expanded(
+                                  child: Column(
+                                    crossAxisAlignment: CrossAxisAlignment.start,
+                                    children: [
+                                      Text(
+                                        'Série ${serie.index}',
+                                        style: GoogleFonts.inter(
+                                          fontWeight: FontWeight.w600,
+                                          fontSize: 14,
+                                          color: AppColors.textPrimary,
+                                        ),
+                                      ),
+                                      Text('${serie.reps} reps', style: AppTheme.metadataStyle),
+                                    ],
+                                  ),
+                                ),
+                                GlassBadge(
+                                  label: serie.completed ? 'Complet' : 'En cours',
+                                  color: serie.completed
+                                      ? AppColors.success
+                                      : AppColors.warning,
+                                ),
+                                const SizedBox(width: 8),
+                                const Icon(Icons.edit_rounded,
+                                    size: 16, color: AppColors.textMuted),
+                              ],
+                            ),
+                          ),
+                        ),
+                      ),
+                    );
+                  }),
+                  OutlinedButton.icon(
+                    onPressed: () {
+                      final lastReps =
+                          combat.series.isNotEmpty ? combat.series.last.reps : 10;
+                      ref.read(combatNotifierProvider.notifier).addSerie(reps: lastReps);
+                    },
+                    icon: const Icon(Icons.add_rounded, size: 18),
+                    label: const Text('Ajouter une série'),
+                  ),
+                  const SizedBox(height: 20),
+
+                  Wrap(
+                    spacing: 10,
+                    runSpacing: 10,
+                    children: [
+                      _SummaryChip(label: 'Sets', value: '${combat.completedSets}/${combat.totalSets}'),
+                      _SummaryChip(label: 'Reps', value: '${combat.totalReps}'),
+                      _SummaryChip(label: 'Temps', value: _formatDuration(combat.elapsedSeconds)),
+                      _SummaryChip(
+                          label: 'Calories', value: combat.estimatedCalories(calc).toStringAsFixed(0)),
+                    ],
+                  ),
+                ],
               ),
             ),
-            Container(
-              padding: const EdgeInsets.all(20),
-              decoration: BoxDecoration(
-                color: AppColors.surface,
-                border: Border(
-                  top: BorderSide(color: AppColors.surfaceElevated.withValues(alpha: 0.5)),
-                ),
-              ),
-              child: Column(
-                crossAxisAlignment: CrossAxisAlignment.stretch,
-                children: [
-                  ParticleBurst(
-                    trigger: _showParticles,
+          ),
+          // ── Barre d'action fixe en bas ──
+          Container(
+            padding: const EdgeInsets.fromLTRB(18, 16, 18, 18),
+            decoration: BoxDecoration(
+              color: AppColors.surfaceElevated.withValues(alpha: 0.9),
+              border: Border(top: BorderSide(color: AppColors.glassBorder)),
+            ),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.stretch,
+              children: [
+                ParticleBurst(
+                  trigger: _showParticles,
+                  child: SizedBox(
+                    height: 54,
                     child: ElevatedButton(
                       onPressed: combat.isValidating || combat.completedSets == 0
                           ? null
                           : _validateCombat,
                       style: ElevatedButton.styleFrom(
-                        minimumSize: const Size(double.infinity, 52),
                         backgroundColor: AppColors.success,
+                        disabledBackgroundColor: AppColors.success.withValues(alpha: 0.3),
                       ),
                       child: combat.isValidating
                           ? const SizedBox(
                               height: 20,
                               width: 20,
-                              child: CircularProgressIndicator(strokeWidth: 2),
+                              child: CircularProgressIndicator(
+                                  strokeWidth: 2, color: Colors.white),
                             )
                           : const Text('VALIDER LE COMBAT'),
                     ),
                   ),
-                  const SizedBox(height: 8),
-                  OutlinedButton(
-                    onPressed: combat.isValidating
-                        ? null
-                        : () {
-                            ref.read(combatNotifierProvider.notifier).abandonCombat();
-                            context.go(AppRoutes.mur);
-                          },
-                    child: const Text('ABANDONNER'),
-                  ),
-                ],
-              ),
+                ),
+                const SizedBox(height: 8),
+                OutlinedButton(
+                  onPressed: combat.isValidating
+                      ? null
+                      : () {
+                          ref.read(combatNotifierProvider.notifier).abandonCombat();
+                          context.go(AppRoutes.mur);
+                        },
+                  child: const Text('ABANDONNER'),
+                ),
+              ],
             ),
-          ],
-        ),
+          ),
+        ],
       ),
     );
   }
@@ -370,8 +392,9 @@ class _SummaryChip extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
       decoration: BoxDecoration(
-        color: AppColors.surfaceElevated,
-        borderRadius: BorderRadius.circular(10),
+        color: AppColors.glassCard,
+        borderRadius: BorderRadius.circular(12),
+        border: Border.all(color: AppColors.glassBorder),
       ),
       child: Column(
         children: [
