@@ -5,8 +5,12 @@
 import 'package:hive_ce/hive_ce.dart';
 import 'package:level_up/data/local/models/combat_hive.dart';
 import 'package:level_up/data/local/models/defi_hive.dart';
+import 'package:level_up/data/local/models/exercice_seance_hive.dart';
+import 'package:level_up/data/local/models/exercice_template_hive.dart';
+import 'package:level_up/data/local/models/jour_template_hive.dart';
 import 'package:level_up/data/local/models/message_hive.dart';
 import 'package:level_up/data/local/models/rune_hive.dart';
+import 'package:level_up/data/local/models/seance_programmee_hive.dart';
 import 'package:level_up/data/local/models/serie_combat_hive.dart';
 import 'package:level_up/data/local/models/veilleur_hive.dart';
 
@@ -14,8 +18,12 @@ extension HiveRegistrar on HiveInterface {
   void registerAdapters() {
     registerAdapter(CombatHiveAdapter());
     registerAdapter(DefiHiveAdapter());
+    registerAdapter(ExerciceSeanceHiveAdapter());
+    registerAdapter(ExerciceTemplateHiveAdapter());
+    registerAdapter(JourTemplateHiveAdapter());
     registerAdapter(MessageHiveAdapter());
     registerAdapter(RuneHiveAdapter());
+    registerAdapter(SeanceProgrammeeHiveAdapter());
     registerAdapter(SerieCombatHiveAdapter());
     registerAdapter(VeilleurHiveAdapter());
   }
@@ -25,8 +33,12 @@ extension IsolatedHiveRegistrar on IsolatedHiveInterface {
   void registerAdapters() {
     registerAdapter(CombatHiveAdapter());
     registerAdapter(DefiHiveAdapter());
+    registerAdapter(ExerciceSeanceHiveAdapter());
+    registerAdapter(ExerciceTemplateHiveAdapter());
+    registerAdapter(JourTemplateHiveAdapter());
     registerAdapter(MessageHiveAdapter());
     registerAdapter(RuneHiveAdapter());
+    registerAdapter(SeanceProgrammeeHiveAdapter());
     registerAdapter(SerieCombatHiveAdapter());
     registerAdapter(VeilleurHiveAdapter());
   }

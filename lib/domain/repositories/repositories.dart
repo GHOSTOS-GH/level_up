@@ -4,6 +4,8 @@ import '../entities/defi.dart';
 import '../entities/narrative_entities.dart';
 import '../entities/rune.dart';
 import '../entities/veilleur.dart';
+import '../entities/programme_template.dart';
+import '../entities/seance_programmee.dart';
 
 // ─── Veilleur ────────────────────────────────────────────────────────────────
 
@@ -53,4 +55,31 @@ abstract class RuneRepository {
 abstract class DataExportRepository {
   Future<String> exportToJson();
   Future<void> importFromJson(String jsonContent);
+}
+
+// ─── Programme (templates hebdomadaires récurrents) ────────────────────────
+
+abstract class ProgrammeRepository {
+  /// Les 7 jours (lundi → dimanche). Toujours complet (initialisé au seed).
+  Future<List<JourTemplate>> getAllTemplates();
+
+  Future<JourTemplate> getTemplateForDay(int dayOfWeek);
+
+  Future<void> saveTemplate(JourTemplate template);
+
+  /// Seed initial : crée les 7 jours par défaut si absents.
+  Future<void> initializeTemplates(List<JourTemplate> defaults);
+}
+
+// ─── Séances programmées (instances datées) ────────────────────────────────
+
+abstract class SeanceRepository {
+  Future<SeanceProgrammee?> getSeanceForDate(DateTime date);
+
+  Future<SeanceProgrammee> saveSeance(SeanceProgrammee seance);
+
+  /// Pour le calendrier : toutes les séances entre deux dates (inclusives).
+  Future<List<SeanceProgrammee>> getSeancesInRange(DateTime start, DateTime end);
+
+  Future<void> deleteSeance(DateTime date);
 }
